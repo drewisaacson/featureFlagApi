@@ -9,6 +9,8 @@ def configure_feature_for_user(
     override: FeatureOverride,
     dao: FeatureConfigDao,
 ) -> FeatureOverride:
+    if dao.get_feature(feature_name) is None:
+        raise ValueError("Feature not found")
     if override.timestamp is None:
         # Set timestamp to now if not provided
         override = override.model_copy(

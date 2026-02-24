@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 import logging
 import os
 
@@ -37,6 +37,11 @@ def configure_feature_for_user(
     logger.info(
         "Configuring feature %s for user %s", feature_name, config.user_id
     )
+    if dao.get_feature(feature_name) is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Feature not found",
+        )
     configuredFeat = configure_feature_for_user_activity(
         feature_name, config, dao)
     return {

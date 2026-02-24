@@ -11,25 +11,25 @@ class TestFeatureValidation:
     def test_feature_valid_with_all_fields(self):
         """Test creating a Feature with all fields provided."""
         data = {
-            "feature_name": "dark_mode",
+            "feature_name": "dummy",
             "value": "enabled",
             "feature_description": "Enable dark mode for users",
             "timestamp": datetime(2024, 1, 1, 12, 0, 0),
         }
         feature = Feature(**data)
-        assert feature.feature_name == "dark_mode"
+        assert feature.feature_name == "dummy"
         assert feature.value == "enabled"
         assert feature.feature_description == "Enable dark mode for users"
 
     def test_feature_valid_without_optional_fields(self):
         """Test creating a Feature with only required fields."""
         data = {
-            "feature_name": "new_api",
+            "feature_name": "dummy",
             "value": "beta",
             "timestamp": datetime.now(),
         }
         feature = Feature(**data)
-        assert feature.feature_name == "new_api"
+        assert feature.feature_name == "dummy"
         assert feature.value == "beta"
         assert feature.feature_description is None
 
@@ -46,7 +46,7 @@ class TestFeatureValidation:
     def test_feature_missing_value(self):
         """Test that Feature requires value."""
         data = {
-            "feature_name": "test_feature",
+            "feature_name": "dummy",
             "timestamp": datetime.now(),
         }
         with pytest.raises(ValidationError) as exc_info:
@@ -56,7 +56,7 @@ class TestFeatureValidation:
     def test_feature_missing_timestamp(self):
         """Test that Feature allows missing timestamp."""
         data = {
-            "feature_name": "test_feature",
+            "feature_name": "dummy",
             "value": "enabled",
         }
         feature = Feature(**data)
@@ -78,7 +78,7 @@ class TestFeatureValidation:
     def test_feature_empty_string_value(self):
         """Test that empty string for value is rejected."""
         data = {
-            "feature_name": "test_feature",
+            "feature_name": "dummy",
             "value": "",
             "timestamp": datetime.now(),
         }
@@ -91,7 +91,7 @@ class TestFeatureValidation:
     def test_feature_empty_string_description(self):
         """Test that empty string for description is rejected."""
         data = {
-            "feature_name": "test_feature",
+            "feature_name": "dummy",
             "value": "enabled",
             "feature_description": "",
             "timestamp": datetime.now(),
@@ -105,7 +105,7 @@ class TestFeatureValidation:
     def test_feature_invalid_timestamp_type(self):
         """Test that invalid timestamp type is rejected."""
         data = {
-            "feature_name": "test_feature",
+            "feature_name": "dummy",
             "value": "enabled",
             "timestamp": "2024-01-01",
         }
@@ -115,7 +115,7 @@ class TestFeatureValidation:
     def test_feature_with_iso_timestamp_string(self):
         """Test that ISO format timestamp strings are accepted."""
         data = {
-            "feature_name": "test_feature",
+            "feature_name": "dummy",
             "value": "enabled",
             "timestamp": "2024-01-01T12:00:00",
         }
