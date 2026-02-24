@@ -12,13 +12,15 @@ from .activity.getFeature import get_feature as get_feature_activity
 from .activity.getFeatureForUser import (
     get_feature_for_user as get_feature_for_user_activity,
 )
+from .db.cachedFeatureConfigDao import CachedFeatureConfigDao
 from .db.inMemoryFeatureConfigDao import InMemoryFeatureConfigDao
 from .items.feature import Feature
 from .items.featureOverride import FeatureOverride
 
 
 app = FastAPI()
-dao = InMemoryFeatureConfigDao()
+base_dao = InMemoryFeatureConfigDao()
+dao = CachedFeatureConfigDao(base_dao, ttl_seconds=300)
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

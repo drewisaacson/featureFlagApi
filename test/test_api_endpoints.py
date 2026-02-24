@@ -41,7 +41,9 @@ def test_get_feature_returns_404_when_missing(client_with_dao):
 def test_get_feature_for_user_returns_200_with_override(
     client_with_dao,
 ):
-    """Test GET /feature/{feature_name}/user/{user_id} returns 200 with override data."""
+    """
+    Test GET /feature/{feature_name}/user/{user_id} returns 200 with override.
+    """
     client, dao = client_with_dao
     feature = Feature(
         feature_name="dummy",
@@ -65,7 +67,9 @@ def test_get_feature_for_user_returns_200_with_override(
 def test_get_feature_for_user_returns_404_when_missing(
     client_with_dao,
 ):
-    """Test GET /feature/{feature_name}/user/{user_id} returns 404 when override not found."""
+    """
+    Test GET /feature/{feature_name}/user/{user_id} returns 404 when missing.
+    """
     client, _ = client_with_dao
     response = client.get("/feature/dummy/user/nonexistent")
     assert response.status_code == 404

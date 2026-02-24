@@ -1,5 +1,4 @@
 from datetime import datetime
-import json
 
 from app.db.inMemoryFeatureConfigDao import InMemoryFeatureConfigDao
 from app.items.feature import Feature
