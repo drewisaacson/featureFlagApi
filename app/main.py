@@ -6,7 +6,6 @@ from app.items.featureOverride import FeatureOverride
 from app.items.feature import Feature
 
 
-
 app = FastAPI()
 
 logging.basicConfig(level=logging.INFO)

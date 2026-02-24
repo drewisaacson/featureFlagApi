@@ -122,4 +122,3 @@ class TestFeatureValidation:
         }
         feature = Feature(**data)
         assert isinstance(feature.timestamp, datetime)
-

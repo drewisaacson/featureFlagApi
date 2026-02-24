@@ -170,4 +170,3 @@ class TestFeatureOverrideValidation:
         }
         override = FeatureOverride(**data)
         assert override.user_id == "user-123@domain.com"
-

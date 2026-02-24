@@ -20,4 +20,4 @@ lint:
 clean:
 	rm -rf $(VENV)
 
-build: test lint
+build: lint test
