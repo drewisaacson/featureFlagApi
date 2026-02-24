@@ -2,6 +2,10 @@ from fastapi import FastAPI
 import os
 import logging
 
+from app.items.featureOverride import FeatureOverride
+from app.items.feature import Feature
+
+
 
 app = FastAPI()
 
@@ -13,12 +17,22 @@ PORT = int(os.getenv("PORT", 8080))
 
 
 @app.post("/feature")
-def configure_feature():
-    logger.info("Ingesting event for user %s", event.user_id)
+def configure_feature(feature: Feature):
+    logger.info("Ingesting event for user %s", feature.feature_name)
     return {"status": "accepted"}
 
 
-@app.get("/feature/{feature_name}/default")
+@app.post("/feature/{feature_name}")
+def configure_feature_for_user(
+    feature_name: str, config: FeatureOverride
+):
+    logger.info(
+        "Configuring feature %s for user %s", feature_name, config.user_id
+    )
+    return {"status": "accepted", "feature": feature_name}
+
+
+@app.get("/feature/{feature_name}")
 def get_default_for_feature(feature_name: str):
     default = {
         "feature_name": feature_name,
@@ -37,6 +51,7 @@ def get_feature_for_user(feature_name: str, user_id: str):
 
     return feature
 
+
 @app.get("/feature/{feature_name}/user/{user_id}/status")
 def get_or_default_feature_status_for_user(feature_name: str, user_id: str):
     feature = {
@@ -54,10 +69,10 @@ def get_or_default_feature_status_for_user(feature_name: str, user_id: str):
 
     return feature
 
+
 @app.get("/health")
 def health():
     return {"status": "ok"}
-
 
 
 if __name__ == "__main__":
