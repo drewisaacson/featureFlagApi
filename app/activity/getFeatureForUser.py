@@ -32,6 +32,11 @@ def get_feature_for_user(
             feature_name=feature_name,
             user_id=user_id,
             value=feat.value,
+            isDefault=True,
         )
+    else:
+        if override.isDefault is None:
+            # set isDefault to False for overrides that exist
+            override = override.model_copy(update={"isDefault": False})
 
     return override

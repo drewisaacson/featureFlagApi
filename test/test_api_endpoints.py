@@ -62,6 +62,7 @@ def test_get_feature_for_user_returns_200_with_override(
     assert response.status_code == 200
     assert response.json()["status"] == "ok"
     assert response.json()["override"]["user_id"] == "user_1"
+    assert response.json()["override"]["isDefault"] is False
 
 
 def test_get_feature_for_user_returns_200_with_default_value(
@@ -81,6 +82,7 @@ def test_get_feature_for_user_returns_200_with_default_value(
     assert response.status_code == 200
     assert response.json()["status"] == "ok"
     assert response.json()["override"]["value"] == "enabled"
+    assert response.json()["override"]["isDefault"] is True
 
 
 def test_get_feature_for_user_returns_404_when_feature_missing(

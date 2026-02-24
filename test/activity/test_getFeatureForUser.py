@@ -25,6 +25,7 @@ def test_get_feature_for_user_returns_override(tmp_path):
     assert retrieved.feature_name == "dummy"
     assert retrieved.user_id == "user_1"
     assert retrieved.value == "disabled"
+    assert retrieved.isDefault is False
 
 
 def test_get_feature_for_user_missing_override_returns_default(tmp_path):
@@ -41,6 +42,7 @@ def test_get_feature_for_user_missing_override_returns_default(tmp_path):
     assert retrieved.feature_name == "dummy"
     assert retrieved.user_id == "user_1"
     assert retrieved.value == "enabled"
+    assert retrieved.isDefault is True
 
 
 def test_get_feature_for_user_missing_feature_raises_error(tmp_path):
