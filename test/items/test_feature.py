@@ -54,14 +54,13 @@ class TestFeatureValidation:
         assert "value" in str(exc_info.value)
 
     def test_feature_missing_timestamp(self):
-        """Test that Feature requires timestamp."""
+        """Test that Feature allows missing timestamp."""
         data = {
             "feature_name": "test_feature",
             "value": "enabled",
         }
-        with pytest.raises(ValidationError) as exc_info:
-            Feature(**data)
-        assert "timestamp" in str(exc_info.value)
+        feature = Feature(**data)
+        assert feature.timestamp is None
 
     def test_feature_empty_string_feature_name(self):
         """Test that empty string for feature_name is rejected."""

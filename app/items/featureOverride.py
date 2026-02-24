@@ -18,6 +18,7 @@ class FeatureOverride(BaseModel):
         default=None, min_length=1,
         description="Optional override justification"
     )
-    timestamp: datetime = Field(
+    timestamp: Optional[datetime] = Field(
+        default=None,
         description="The timestamp when this configuration was created"
     )

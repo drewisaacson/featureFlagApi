@@ -1,12 +1,20 @@
 from fastapi import FastAPI
-import os
 import logging
+import os
 
-from .items.featureOverride import FeatureOverride
+from .activity.configureFeature import (
+    configure_feature as configure_feature_activity,
+)
+from .activity.configureFeatureForUser import (
+    configure_feature_for_user as configure_feature_for_user_activity,
+)
+from .db.inMemoryFeatureConfigDao import InMemoryFeatureConfigDao
 from .items.feature import Feature
+from .items.featureOverride import FeatureOverride
 
 
 app = FastAPI()
+dao = InMemoryFeatureConfigDao()
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -16,9 +24,10 @@ PORT = int(os.getenv("PORT", 8080))
 
 
 @app.post("/feature")
-def create_feature(feature: Feature):
-    logger.info("Ingesting event for user %s", feature.feature_name)
-    return {"status": "accepted"}
+def configure_feature(feature: Feature):
+    logger.info("Configuring feature %s", feature.feature_name)
+    configuredFeat = configure_feature_activity(feature, dao)
+    return {"status": "accepted", "feature": configuredFeat.model_dump()}
 
 
 @app.post("/feature/{feature_name}")
@@ -28,7 +37,13 @@ def configure_feature_for_user(
     logger.info(
         "Configuring feature %s for user %s", feature_name, config.user_id
     )
-    return {"status": "accepted", "feature": feature_name}
+    configuredFeat = configure_feature_for_user_activity(
+        feature_name, config, dao)
+    return {
+        "status": "accepted",
+        "feature": feature_name,
+        "override": configuredFeat.model_dump(),
+    }
 
 
 @app.get("/feature/{feature_name}")

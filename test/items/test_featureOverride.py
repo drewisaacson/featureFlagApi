@@ -71,15 +71,14 @@ class TestFeatureOverrideValidation:
         assert "value" in str(exc_info.value)
 
     def test_featureoverride_missing_timestamp(self):
-        """Test that FeatureOverride requires timestamp."""
+        """Test that FeatureOverride allows missing timestamp."""
         data = {
             "feature_name": "test_feature",
             "user_id": "user_123",
             "value": "enabled",
         }
-        with pytest.raises(ValidationError) as exc_info:
-            FeatureOverride(**data)
-        assert "timestamp" in str(exc_info.value)
+        override = FeatureOverride(**data)
+        assert override.timestamp is None
 
     def test_featureoverride_empty_string_feature_name(self):
         """Test that empty string for feature_name is rejected."""
