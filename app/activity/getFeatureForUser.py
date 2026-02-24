@@ -19,9 +19,19 @@ def get_feature_for_user(
         The FeatureOverride object
 
     Raises:
-        ValueError: If the override is not found
+        ValueError: If the feature is not found
     """
     override = dao.get_override(feature_name, user_id)
     if override is None:
-        raise ValueError("Override not found")
+        # check if the feature exists at all
+        feat = dao.get_feature(feature_name)
+        if feat is None:
+            raise ValueError(f"Feature {feature_name} not found")
+        # we use the feature's default value instead
+        override = FeatureOverride(
+            feature_name=feature_name,
+            user_id=user_id,
+            value=feat.value,
+        )
+
     return override

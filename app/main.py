@@ -67,7 +67,7 @@ def get_feature(feature_name: str):
     except ValueError:
         raise HTTPException(
             status_code=404,
-            detail="Feature not found",
+            detail=f"Feature {feature_name} not found",
         )
 
 
@@ -81,10 +81,10 @@ def get_feature_for_user(feature_name: str, user_id: str):
             feature_name, user_id, dao
         )
         return {"status": "ok", "override": override.model_dump()}
-    except ValueError:
+    except ValueError as exc:
         raise HTTPException(
             status_code=404,
-            detail="Override not found",
+            detail=str(exc),
         )
 
 

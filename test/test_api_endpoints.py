@@ -35,7 +35,7 @@ def test_get_feature_returns_404_when_missing(client_with_dao):
     client, _ = client_with_dao
     response = client.get("/feature/nonexistent")
     assert response.status_code == 404
-    assert "Feature not found" in response.json()["detail"]
+    assert "Feature nonexistent not found" in response.json()["detail"]
 
 
 def test_get_feature_for_user_returns_200_with_override(
@@ -64,13 +64,32 @@ def test_get_feature_for_user_returns_200_with_override(
     assert response.json()["override"]["user_id"] == "user_1"
 
 
-def test_get_feature_for_user_returns_404_when_missing(
+def test_get_feature_for_user_returns_200_with_default_value(
+    client_with_dao,
+):
+    """
+    Test GET /feature/{feature_name}/user/{user_id} returns 200 with default.
+    """
+    client, dao = client_with_dao
+    feature = Feature(
+        feature_name="dummy",
+        value="enabled",
+    )
+    dao.create_feature(feature)
+
+    response = client.get("/feature/dummy/user/nonexistent")
+    assert response.status_code == 200
+    assert response.json()["status"] == "ok"
+    assert response.json()["override"]["value"] == "enabled"
+
+
+def test_get_feature_for_user_returns_404_when_feature_missing(
     client_with_dao,
 ):
     """
     Test GET /feature/{feature_name}/user/{user_id} returns 404 when missing.
     """
     client, _ = client_with_dao
-    response = client.get("/feature/dummy/user/nonexistent")
+    response = client.get("/feature/nonexistent/user/user_1")
     assert response.status_code == 404
-    assert "Override not found" in response.json()["detail"]
+    assert "Feature nonexistent not found" in response.json()["detail"]
