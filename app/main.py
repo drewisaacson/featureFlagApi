@@ -8,6 +8,10 @@ from .activity.configureFeature import (
 from .activity.configureFeatureForUser import (
     configure_feature_for_user as configure_feature_for_user_activity,
 )
+from .activity.getFeature import get_feature as get_feature_activity
+from .activity.getFeatureForUser import (
+    get_feature_for_user as get_feature_for_user_activity,
+)
 from .db.inMemoryFeatureConfigDao import InMemoryFeatureConfigDao
 from .items.feature import Feature
 from .items.featureOverride import FeatureOverride
@@ -53,22 +57,32 @@ def configure_feature_for_user(
 
 @app.get("/feature/{feature_name}")
 def get_feature(feature_name: str):
-    default = {
-        "feature_name": feature_name,
-    }
-
-    return default
+    logger.info("Retrieving feature %s", feature_name)
+    try:
+        feature = get_feature_activity(feature_name, dao)
+        return {"status": "ok", "feature": feature.model_dump()}
+    except ValueError:
+        raise HTTPException(
+            status_code=404,
+            detail="Feature not found",
+        )
 
 
 @app.get("/feature/{feature_name}/user/{user_id}")
 def get_feature_for_user(feature_name: str, user_id: str):
-    feature = {
-        "feature_name": feature_name,
-        "user_id": user_id,
-        "enabled": True
-    }
-
-    return feature
+    logger.info(
+        "Retrieving feature %s for user %s", feature_name, user_id
+    )
+    try:
+        override = get_feature_for_user_activity(
+            feature_name, user_id, dao
+        )
+        return {"status": "ok", "override": override.model_dump()}
+    except ValueError:
+        raise HTTPException(
+            status_code=404,
+            detail="Override not found",
+        )
 
 
 @app.get("/health")
