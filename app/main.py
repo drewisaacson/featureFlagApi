@@ -22,7 +22,8 @@ app = FastAPI()
 base_dao = InMemoryFeatureConfigDao()
 dao = CachedFeatureConfigDao(base_dao, ttl_seconds=300)
 
-logging.basicConfig(level=logging.INFO)
+log_level = os.getenv("LOG_LEVEL", "INFO").upper()
+logging.basicConfig(level=log_level)
 logger = logging.getLogger(__name__)
 
 HOST = os.getenv("HOST", "0.0.0.0")
@@ -94,4 +95,9 @@ def health():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host=HOST, port=PORT)
+    uvicorn.run(
+        app,
+        host=HOST,
+        port=PORT,
+        log_level=log_level.lower(),
+    )

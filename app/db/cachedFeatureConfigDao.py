@@ -1,10 +1,13 @@
 from time import time
+import logging
 from typing import Optional, Dict
 
 from .featureConfigDao import FeatureConfigDao
 from .inMemoryFeatureConfigDao import InMemoryFeatureConfigDao
 from ..items.feature import Feature
 from ..items.featureOverride import FeatureOverride
+
+logger = logging.getLogger(__name__)
 
 
 class CachedFeatureConfigDao(FeatureConfigDao):
@@ -27,6 +30,10 @@ class CachedFeatureConfigDao(FeatureConfigDao):
         self.feature_cache_times: Dict[str, float] = {}
         self.override_cache: Dict[tuple, FeatureOverride] = {}
         self.override_cache_times: Dict[tuple, float] = {}
+        logger.info(
+            "Initialized CachedFeatureConfigDao with TTL=%d seconds",
+            ttl_seconds,
+        )
 
     def create_feature(self, feature: Feature) -> Feature:
         """Create feature and invalidate cache."""
@@ -37,12 +44,24 @@ class CachedFeatureConfigDao(FeatureConfigDao):
     def get_feature(self, feature_name: str) -> Optional[Feature]:
         """Get feature from cache or base DAO."""
         if self._is_feature_cache_valid(feature_name):
+            logger.debug(
+                "Cache hit for feature: %s",
+                feature_name,
+            )
             return self.feature_cache.get(feature_name)
 
+        logger.debug(
+            "Cache miss for feature: %s - fetching from DAO",
+            feature_name,
+        )
         feature = self.base_dao.get_feature(feature_name)
         if feature:
             self.feature_cache[feature_name] = feature
             self.feature_cache_times[feature_name] = time()
+            logger.debug(
+                "Feature cached: %s",
+                feature_name,
+            )
         else:
             self._invalidate_feature_cache(feature_name)
         return feature
@@ -65,12 +84,27 @@ class CachedFeatureConfigDao(FeatureConfigDao):
         """Get override from cache or base DAO."""
         cache_key = (feature_name, user_id)
         if self._is_override_cache_valid(cache_key):
+            logger.debug(
+                "Cache hit for override: %s user %s",
+                feature_name,
+                user_id,
+            )
             return self.override_cache.get(cache_key)
 
+        logger.debug(
+            "Cache miss for override: %s user %s - fetching from DAO",
+            feature_name,
+            user_id,
+        )
         override = self.base_dao.get_override(feature_name, user_id)
         if override:
             self.override_cache[cache_key] = override
             self.override_cache_times[cache_key] = time()
+            logger.debug(
+                "Override cached: %s user %s",
+                feature_name,
+                user_id,
+            )
         else:
             self._invalidate_override_cache(feature_name, user_id)
         return override

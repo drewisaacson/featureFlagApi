@@ -1,9 +1,12 @@
 # app/db/inMemoryFeatureConfigDao.py
 import json
+import logging
 from typing import Optional, Dict
 from .featureConfigDao import FeatureConfigDao
 from ..items.feature import Feature
 from ..items.featureOverride import FeatureOverride
+
+logger = logging.getLogger(__name__)
 
 
 class InMemoryFeatureConfigDao(FeatureConfigDao):
@@ -65,8 +68,16 @@ class InMemoryFeatureConfigDao(FeatureConfigDao):
             }
             with open(self.cache_file, "w") as f:
                 json.dump(data, f)
+            logger.debug(
+                "Cache saved to file: %s",
+                self.cache_file,
+            )
         except Exception as e:
-            print(f"Error saving to file: {e}")
+            logger.error(
+                "Error saving cache to file %s: %s",
+                self.cache_file,
+                e,
+            )
 
     def _load_from_file(self):
         """Load from persistent file on startup"""
@@ -84,7 +95,18 @@ class InMemoryFeatureConfigDao(FeatureConfigDao):
                     }
                     for k, v in data.get("overrides", {}).items()
                 }
+                logger.info(
+                    "Loaded cache from file: %s ",
+                    self.cache_file
+                )
         except FileNotFoundError:
-            pass  # First startup
+            logger.debug(
+                "Cache file not found at %s - starting fresh",
+                self.cache_file,
+            )
         except json.JSONDecodeError:
-            pass  # Empty or corrupted cache file
+            logger.warning(
+                "Cache file at %s is corrupted or empty - "
+                "discarding and starting fresh",
+                self.cache_file,
+            )
