@@ -2,8 +2,8 @@ from fastapi import FastAPI
 import os
 import logging
 
-from app.items.featureOverride import FeatureOverride
-from app.items.feature import Feature
+from .items.featureOverride import FeatureOverride
+from .items.feature import Feature
 
 
 app = FastAPI()
@@ -16,7 +16,7 @@ PORT = int(os.getenv("PORT", 8080))
 
 
 @app.post("/feature")
-def configure_feature(feature: Feature):
+def create_feature(feature: Feature):
     logger.info("Ingesting event for user %s", feature.feature_name)
     return {"status": "accepted"}
 
@@ -32,7 +32,7 @@ def configure_feature_for_user(
 
 
 @app.get("/feature/{feature_name}")
-def get_default_for_feature(feature_name: str):
+def get_feature(feature_name: str):
     default = {
         "feature_name": feature_name,
     }
@@ -47,24 +47,6 @@ def get_feature_for_user(feature_name: str, user_id: str):
         "user_id": user_id,
         "enabled": True
     }
-
-    return feature
-
-
-@app.get("/feature/{feature_name}/user/{user_id}/status")
-def get_or_default_feature_status_for_user(feature_name: str, user_id: str):
-    feature = {
-        "feature_name": feature_name,
-        "user_id": user_id,
-        "enabled": True
-    }
-
-    if feature is None:
-        # feature = service.get_default_for_feature(feature_name)
-        feature = {
-            "feature_name": feature_name,
-            "enabled": False
-        }
 
     return feature
 
