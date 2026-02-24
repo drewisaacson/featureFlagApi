@@ -12,6 +12,9 @@ from .activity.getFeature import get_feature as get_feature_activity
 from .activity.getFeatureForUser import (
     get_feature_for_user as get_feature_for_user_activity,
 )
+from .activity.deleteFeatureForUser import (
+    delete_feature_for_user as delete_feature_for_user_activity,
+)
 from .db.cachedFeatureConfigDao import CachedFeatureConfigDao
 from .db.inMemoryFeatureConfigDao import InMemoryFeatureConfigDao
 from .items.feature import Feature
@@ -81,6 +84,25 @@ def get_feature_for_user(feature_name: str, user_id: str):
             feature_name, user_id, dao
         )
         return {"status": "ok", "override": override.model_dump()}
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=404,
+            detail=str(exc),
+        )
+
+
+@app.delete("/feature/{feature_name}/user/{user_id}")
+def delete_feature_for_user(feature_name: str, user_id: str):
+    logger.info(
+        "Deleting feature override %s for user %s",
+        feature_name,
+        user_id,
+    )
+    try:
+        deleted = delete_feature_for_user_activity(
+            feature_name, user_id, dao
+        )
+        return {"status": "ok", "override": deleted.model_dump()}
     except ValueError as exc:
         raise HTTPException(
             status_code=404,

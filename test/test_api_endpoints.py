@@ -35,7 +35,10 @@ def test_get_feature_returns_404_when_missing(client_with_dao):
     client, _ = client_with_dao
     response = client.get("/feature/nonexistent")
     assert response.status_code == 404
-    assert "Feature nonexistent not found" in response.json()["detail"]
+    assert (
+        "Feature nonexistent not found"
+        in response.json()["detail"]
+    )
 
 
 def test_get_feature_for_user_returns_200_with_override(
@@ -94,4 +97,72 @@ def test_get_feature_for_user_returns_404_when_feature_missing(
     client, _ = client_with_dao
     response = client.get("/feature/nonexistent/user/user_1")
     assert response.status_code == 404
-    assert "Feature nonexistent not found" in response.json()["detail"]
+    assert (
+        "Feature nonexistent not found"
+        in response.json()["detail"]
+    )
+
+
+def test_delete_feature_for_user_returns_200_with_override(
+    client_with_dao,
+):
+    """
+    Test DELETE /feature/{feature_name}/user/{user_id} returns 200 with
+    override.
+    """
+    client, dao = client_with_dao
+    feature = Feature(
+        feature_name="dummy",
+        value="enabled",
+    )
+    dao.create_feature(feature)
+
+    override = FeatureOverride(
+        feature_name="dummy",
+        user_id="user_1",
+        value="disabled",
+    )
+    dao.create_override("dummy", override)
+
+    response = client.delete("/feature/dummy/user/user_1")
+    assert response.status_code == 200
+    assert response.json()["status"] == "ok"
+    assert response.json()["override"]["user_id"] == "user_1"
+    assert dao.get_override("dummy", "user_1") is None
+
+
+def test_delete_feature_for_user_returns_404_when_feature_missing(
+    client_with_dao,
+):
+    """
+    Test DELETE /feature/{feature_name}/user/{user_id} 404 when missing.
+    """
+    client, _ = client_with_dao
+    response = client.delete("/feature/nonexistent/user/user_1")
+    assert response.status_code == 404
+    assert (
+        "Feature nonexistent not found"
+        in response.json()["detail"]
+    )
+
+
+def test_delete_feature_for_user_returns_404_when_override_missing(
+    client_with_dao,
+):
+    """
+    Test DELETE /feature/{feature_name}/user/{user_id} 404 when override
+    missing.
+    """
+    client, dao = client_with_dao
+    feature = Feature(
+        feature_name="dummy",
+        value="enabled",
+    )
+    dao.create_feature(feature)
+
+    response = client.delete("/feature/dummy/user/user_1")
+    assert response.status_code == 404
+    assert (
+        "Override for feature dummy and user user_1 not found"
+        in response.json()["detail"]
+    )
